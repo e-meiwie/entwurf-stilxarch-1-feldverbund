@@ -1,0 +1,52 @@
+# Vorlage fuer einen Akquise-Entwurf (demo-teaser).
+#
+# Unterschied zur Vorlage in webseite-bauen: der Entwurf steht unter fremdem
+# Betriebsnamen im Netz. Er darf deshalb unter keinen Umstaenden in einem
+# Suchindex landen - sonst konkurriert er mit der echten Seite des Betriebs.
+# Der X-Robots-Tag wirkt zusaetzlich zum noindex-Meta im HTML und greift auch
+# fuer Dateien, die kein HTML sind (Bilder, PDF).
+
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive, noimageindex"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'self'"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+
+[[headers]]
+  for = "/bilder/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+# Der Entwurf hat kein Formular - eine Anfrage soll beim Betrieb landen, nicht
+# bei mir. Deshalb form-action 'none' in der CSP oben.
+#
+# material/ enthaelt die vollstaendige Kopie der fremden Website: alle Texte,
+# alle Bilder, alle PDF. Das gehoert unter keinen Umstaenden ins Netz. Der
+# Ordner sollte gar nicht erst mit hochgeladen werden - dieser Riegel greift,
+# falls es doch passiert. force = true, damit er vor der Dateiauslieferung
+# zieht und nicht erst, wenn keine Datei gefunden wurde.
+[[redirects]]
+  from = "/material/*"
+  to = "/"
+  status = 404
+  force = true
+
+# Alles andere, was nicht existiert, faellt auf die Startseite zurueck. Ein 404
+# auf einem Entwurf, den jemand aus einem Brief abtippt, waere der schlechteste
+# erste Eindruck.
+[[redirects]]
+  from = "/*"
+  to = "/"
+  status = 302
